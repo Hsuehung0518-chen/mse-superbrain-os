@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090b14">
+  <meta name="description" content="MSE Superbrain OS：Prompt 鍛造、多模型裁定、專注計時與任務管理。">
+  <title>MSE Superbrain OS v3</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <button class="icon-btn hidden" id="backBtn" aria-label="返回首頁">←</button>
+    <div><h1>MSE SUPERBRAIN OS</h1><p>器在外，道在內</p></div>
+    <button class="icon-btn" id="settingsBtn" aria-label="開啟設定">⚙</button>
+  </header>
+
+  <main id="main">
+    <section class="page active" data-page="home" aria-labelledby="homeTitle">
+      <div class="hero"><span>智萃萬象，智粹成器</span><h2 id="homeTitle">今天要鍛造什麼？</h2></div>
+      <div class="feature-grid">
+        <button class="feature-card" data-go="prompt"><b>🧠</b><strong>Prompt 鍛造</strong><span>把想法變成清楚指令</span></button>
+        <button class="feature-card" data-go="compare"><b>⚖️</b><strong>多模型裁定</strong><span>彙整三方回覆再判讀</span></button>
+        <button class="feature-card" data-go="timer"><b>⏱️</b><strong>專注計時</strong><span>5 分、25 分或自訂</span></button>
+        <button class="feature-card" data-go="tasks"><b>✅</b><strong>任務鍛造</strong><span>記錄、完成與清理</span></button>
+      </div>
+      <button class="tour-link" data-go="guide">✨ 功能特色導覽／小白操作指南</button>
+    </section>
+
+    <section class="page" data-page="prompt" aria-labelledby="promptTitle">
+      <div class="page-head"><small>道｜第一殿</small><h2 id="promptTitle">Prompt 鍛造</h2><p>依序填寫四格，再按生成。</p></div>
+      <form class="card" id="promptForm">
+        <label>AI 扮演角色<input id="role" maxlength="120" placeholder="例如：全球 AI 架構師"></label>
+        <label>要完成的任務<textarea id="task" maxlength="4000" placeholder="例如：分析此 AI OS 架構" required></textarea></label>
+        <label>輸出格式<input id="format" maxlength="200" placeholder="例如：繁中 Markdown 大綱"></label>
+        <label>限制與品質要求<textarea id="constraint" maxlength="1000" placeholder="例如：不可空泛、需可執行"></textarea></label>
+        <button class="primary" type="submit">生成 Prompt</button>
+      </form>
+      <div class="card output-card hidden" id="promptResultBox">
+        <div class="card-row"><h3>鍛造結果</h3><button class="small-btn" data-action="copy-prompt">複製</button></div>
+        <textarea id="promptOut" class="result" aria-label="Prompt 生成結果"></textarea>
+        <div class="button-row"><button data-action="open-ai-picker">選擇 AI 開啟</button><button data-action="export-md">匯出 .md</button></div>
+      </div>
+    </section>
+
+    <section class="page" data-page="compare" aria-labelledby="compareTitle">
+      <div class="page-head"><small>道｜第二殿</small><h2 id="compareTitle">多模型裁定</h2><p>貼上回覆，建立結構化比較草稿。</p></div>
+      <form class="card" id="compareForm">
+        <label>ChatGPT 回覆<textarea id="gpt" maxlength="20000"></textarea></label>
+        <label>Gemini 回覆<textarea id="gemini" maxlength="20000"></textarea></label>
+        <label>Grok 回覆<textarea id="grok" maxlength="20000"></textarea></label>
+        <button class="primary" type="submit">生成交叉裁定草稿</button>
+      </form>
+      <div class="card output-card hidden" id="compareResultBox">
+        <div class="card-row"><h3>裁定草稿</h3><button class="small-btn" data-action="copy-result">複製</button></div>
+        <textarea id="result" class="result tall" aria-label="裁定結果"></textarea>
+        <button data-action="export-md">匯出 NotebookLM Markdown</button>
+      </div>
+    </section>
+
+    <section class="page" data-page="timer" aria-labelledby="timerTitle">
+      <div class="page-head"><small>器｜第一殿</small><h2 id="timerTitle">專注計時</h2><p>離開畫面後仍依實際時間校正。</p></div>
+      <div class="card timer-card">
+        <div class="timer-orb" id="timerOrb"><span id="timerText">05:00</span><small id="timerStatus">準備開始</small></div>
+        <div class="progress"><i id="timerProgress"></i></div>
+        <div class="button-row"><button data-seconds="300">5 分</button><button data-seconds="1500">25 分</button></div>
+        <form id="customTimerForm" class="inline-form"><input id="customMin" type="number" min="1" max="180" inputmode="numeric" placeholder="1–180 分鐘" aria-label="自訂分鐘"><button type="submit">套用</button></form>
+        <div class="button-row"><button class="primary" id="startBtn" data-action="toggle-timer">開始</button><button data-action="reset-timer">重置</button></div>
+      </div>
+    </section>
+
+    <section class="page" data-page="tasks" aria-labelledby="tasksTitle">
+      <div class="page-head"><small>器｜第二殿</small><h2 id="tasksTitle">任務鍛造</h2><p>點任務即可切換完成狀態。</p></div>
+      <form class="card inline-form" id="taskForm"><input id="taskInput" maxlength="300" placeholder="輸入一項可執行任務" required><button class="primary" type="submit">新增</button></form>
+      <div class="card"><div class="card-row"><span id="taskCounter">尚無任務</span><button class="small-btn" data-action="clear-completed">清除已完成</button></div><div id="tasks" class="task-list"></div></div>
+    </section>
+
+    <section class="page" data-page="guide" aria-labelledby="guideTitle">
+      <div class="page-head"><small>導覽殿</small><h2 id="guideTitle">全功能操作指南</h2><p>第一次使用，照著四條路走即可。</p></div>
+      <div class="guide-list">
+        <details open><summary>🧠 1. 建立好 Prompt</summary><ol><li>首頁點「Prompt 鍛造」。</li><li>至少填寫「任務」，角色、格式、限制可補強結果。</li><li>按「生成 Prompt」，可複製、匯出或選擇一個 AI 開啟。</li></ol></details>
+        <details><summary>⚖️ 2. 比較三個 AI</summary><ol><li>將 Prompt 分別交給不同 AI。</li><li>把回覆貼進對應欄位，至少填一份。</li><li>按「生成交叉裁定草稿」；它會忠實並列，不會冒充 AI 自動判斷。</li><li>將草稿再交給 AI 做最終綜整，或匯出到 NotebookLM。</li></ol></details>
+        <details><summary>⏱️ 3. 專注計時</summary><ol><li>選 5 分、25 分或輸入 1–180 分鐘。</li><li>按開始；可暫停、繼續、重置。</li><li>完成時依設定播放提示音與震動。</li></ol></details>
+        <details><summary>✅ 4. 管理任務</summary><ol><li>輸入任務後按新增。</li><li>點任務文字切換完成；點垃圾桶刪除。</li><li>「清除已完成」會先要求確認。</li></ol></details>
+        <details><summary>⚙️ 5. 設定、備份與安裝</summary><ol><li>右上角設定可切換明暗模式、調整字級、提示音與震動。</li><li>「匯出 JSON」可備份；匯入前會驗證格式與大小。</li><li>支援的瀏覽器可按「安裝 App」加入桌面；離線仍可使用本機功能。</li></ol></details>
+        <details><summary>🔐 隱私與安全</summary><p>所有內容預設只存於這台裝置的瀏覽器。程式不內含 API 金鑰，不會自動把 Prompt 或任務送到外部服務。使用外部 AI 時，仍請勿貼上身分證、醫療、金融或機密資料。</p></details>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="settingsDialog"><form method="dialog" class="dialog-card"><div class="card-row"><h2>設定</h2><button class="icon-btn" value="close" aria-label="關閉">✕</button></div>
+  <label>外觀<select id="themeSelect"><option value="system">跟隨裝置</option><option value="dark">深色</option><option value="light">明亮</option></select></label>
+  <label>字體大小<select id="fontSelect"><option value="small">標準</option><option value="medium">較大</option><option value="large">特大</option></select></label>
+  <label class="switch"><span>計時完成提示音</span><input type="checkbox" id="soundToggle"></label>
+  <label class="switch"><span>按鈕震動／完成震動</span><input type="checkbox" id="vibrateToggle"></label>
+  <hr><h3>資料備份</h3><div class="button-row"><button type="button" data-action="export-json">匯出 JSON</button><button type="button" data-action="import-json">匯入 JSON</button></div>
+  <input class="hidden" id="importFile" type="file" accept="application/json,.json">
+  <button type="button" data-action="self-test">🧪 執行自我檢測</button><pre id="selfTestOut" class="test-output" aria-live="polite"></pre>
+  <button type="button" id="installBtn" class="hidden">安裝 App</button>
+  <button type="button" class="danger" data-action="clear-data">清除所有本機資料</button>
+  <button class="primary" value="close">套用並關閉</button>
+</form></dialog>
+
+<dialog id="aiDialog"><form method="dialog" class="dialog-card"><div class="card-row"><h2>選擇一個 AI</h2><button class="icon-btn" value="close" aria-label="關閉">✕</button></div><p class="muted">Prompt 會先複製，再由您自行貼上。一次只開一頁，較不會被瀏覽器阻擋。</p><div class="stack"><button value="close" data-ai-url="https://chatgpt.com/">ChatGPT</button><button value="close" data-ai-url="https://gemini.google.com/">Gemini</button><button value="close" data-ai-url="https://grok.com/">Grok</button></div></form></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="app.js" defer></script>
+</body></html>
